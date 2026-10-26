@@ -17,6 +17,8 @@
         "description": "Set a preference weight (1 to 5 stars) for each selected topic.",
         "data": {
           "weight_general": "General & Society (1 to 5)",
+          "weight_journal": "News Press & Journal (1 to 5)",
+          "weight_politics": "Political News (1 to 5)",
           "weight_technology": "Tech & AI (1 to 5)",
           "weight_business": "Business & Markets (1 to 5)",
           "weight_science": "Science & Space (1 to 5)",
@@ -47,6 +49,8 @@
           "categories": "Active Topics / Categories",
           "keywords": "Custom Keywords",
           "weight_general": "General Weight (1-5)",
+          "weight_journal": "Journal Weight (1-5)",
+          "weight_politics": "Politics Weight (1-5)",
           "weight_technology": "Tech & AI Weight (1-5)",
           "weight_business": "Business Weight (1-5)",
           "weight_science": "Science Weight (1-5)",

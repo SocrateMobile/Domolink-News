@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Hassfest](https://img.shields.io/badge/Hassfest-Passing-10b981.svg)](https://github.com/SocrateMobile/Domolink-News)
-[![Release](https://img.shields.io/badge/Version-v1.0.1-38bdf8.svg)](https://github.com/SocrateMobile/Domolink-News/releases)
+[![Release](https://img.shields.io/badge/Version-v1.0.2-38bdf8.svg)](https://github.com/SocrateMobile/Domolink-News/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **DomoLink-News** est une intégration Home Assistant moderne, rapide et élégante pour diffuser un flux d'actualités synthétique directement dans votre domotique via [NewsAPI.org](https://newsapi.org/).
@@ -14,7 +14,10 @@ Elle intègre un **panneau dédié dans la barre latérale gauche** de Home Assi
 ## ✨ Fonctionnalités Clés
 
 * **🖼️ Panneau Latéral Dédié (Sidebar)** : Accessible en 1 clic dans le menu de gauche (`/domolink-news`), conçu en Web Component natif ultra-fluide avec mode sombre automatique.
-* **⭐ Centres d'intérêt pondérés (1 à 5 étoiles)** : Configurez vos thématiques favorites (`Tech & IA`, `Économie`, `Général`, `Sciences`, `Santé`, `Sports`, `Culture`) et ajustez leur importance.
+* **⭐ Centres d'intérêt pondérés (1 à 5 étoiles)** : Configurez vos thématiques favorites (`Actualité politique`, `Journal d'information`, `Tech & IA`, `Économie`, `Sciences & Espace`, `Santé`, `Sports`, `Culture`) et ajustez leur importance.
+* **⚙️ Onglet Paramètres en direct** : Modifiez à la volée vos filtres, votre pays, votre langue, votre clé API et vos curseurs de priorité directement depuis le panneau latéral sans quitter la page.
+* **🏷️ Badges Thématiques Haute Visibilité** : Badges contrastés et colorés pour identifier instantanément la catégorie de chaque information sur les visuels d'actualité.
+* **📢 Citation claire des Sources** : Attribution systématique citant l'API officielle NewsAPI.org et les rédactions de presse partenaires.
 * **📑 Navigation par onglets & Recherche instantanée** : Consultez tous les flux réunis ou filtrez par thématique, avec barre de recherche en temps réel dans les titres et résumés.
 * **⏱️ Polling Adaptatif Anti-Dépassement de Quota** :
   * **En journée (07h00 - 23h00)** : actualisation toutes les 30 minutes.

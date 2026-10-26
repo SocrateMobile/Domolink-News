@@ -19,6 +19,12 @@ from homeassistant.core import HomeAssistant, ServiceCall, callback
 import homeassistant.helpers.config_validation as cv
 
 from .const import (
+    CONF_API_KEY,
+    CONF_CATEGORIES,
+    CONF_CATEGORY_WEIGHTS,
+    CONF_COUNTRY,
+    CONF_KEYWORDS,
+    CONF_LANGUAGE,
     DOMAIN,
     FRONTEND_FILE_NAME,
     FRONTEND_URL_PATH,
@@ -95,6 +101,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # 5. Register WebSocket API commands for the custom panel
     websocket_api.async_register_command(hass, ws_get_news_data)
     websocket_api.async_register_command(hass, ws_refresh_news_data)
+    websocket_api.async_register_command(hass, ws_save_config)
 
     # 6. Register HA service
     async def async_handle_refresh_service(call: ServiceCall) -> None:
@@ -182,3 +189,57 @@ async def ws_refresh_news_data(
     coordinator: DomoLinkNewsCoordinator = hass.data[DOMAIN][first_key]["coordinator"]
     await coordinator.async_request_refresh()
     connection.send_result(msg["id"], coordinator.data)
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "domolink_news/save_config",
+        vol.Optional("api_key"): cv.string,
+        vol.Optional("country"): cv.string,
+        vol.Optional("language"): cv.string,
+        vol.Optional("categories"): vol.All(cv.ensure_list, [cv.string]),
+        vol.Optional("category_weights"): vol.Schema({cv.string: vol.Coerce(int)}),
+        vol.Optional("keywords"): cv.string,
+    }
+)
+@websocket_api.async_response
+async def ws_save_config(
+    hass: HomeAssistant,
+    connection: websocket_api.ActiveConnection,
+    msg: dict[str, Any],
+) -> None:
+    """Save updated DomoLink-News configuration live from the panel."""
+    if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+        connection.send_error(msg["id"], "not_found", "DomoLink-News is not initialized")
+        return
+
+    first_entry_id = next(iter(hass.data[DOMAIN]))
+    coordinator: DomoLinkNewsCoordinator = hass.data[DOMAIN][first_entry_id]["coordinator"]
+    entry = hass.config_entries.async_get_entry(first_entry_id)
+    if not entry:
+        connection.send_error(msg["id"], "not_found", "Config entry not found")
+        return
+
+    new_data = dict(entry.data)
+    if "api_key" in msg and msg["api_key"] is not None:
+        new_data[CONF_API_KEY] = str(msg["api_key"]).strip()
+    if "country" in msg and msg["country"] is not None:
+        new_data[CONF_COUNTRY] = str(msg["country"]).strip().lower()
+    if "language" in msg and msg["language"] is not None:
+        new_data[CONF_LANGUAGE] = str(msg["language"]).strip().lower()
+    if "categories" in msg and msg["categories"] is not None:
+        new_data[CONF_CATEGORIES] = list(msg["categories"])
+    if "category_weights" in msg and msg["category_weights"] is not None:
+        new_data[CONF_CATEGORY_WEIGHTS] = dict(msg["category_weights"])
+    if "keywords" in msg and msg["keywords"] is not None:
+        new_data[CONF_KEYWORDS] = str(msg["keywords"]).strip()
+
+    # Update HA config entry data
+    hass.config_entries.async_update_entry(entry, data=new_data)
+
+    # Update coordinator in place and trigger fresh fetch
+    coordinator.api_key = new_data.get(CONF_API_KEY, coordinator.api_key)
+    coordinator.update_options(new_data)
+    await coordinator.async_request_refresh()
+
+    connection.send_result(msg["id"], {"success": True, "data": coordinator.data})
