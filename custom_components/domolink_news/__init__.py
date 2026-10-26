@@ -8,6 +8,11 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant.components import frontend, websocket_api
+try:
+    from homeassistant.components.http import StaticPathConfig
+except ImportError:
+    StaticPathConfig = None  # type: ignore[misc,assignment]
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall, callback
@@ -46,23 +51,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # 3. Register static HTTP path for frontend files
     frontend_dir = Path(__file__).parent / "frontend"
     if frontend_dir.exists():
-        try:
+        if hasattr(hass.http, "async_register_static_paths") and StaticPathConfig is not None:
             await hass.http.async_register_static_paths(
                 [
-                    hass.http.StaticPathConfig(
+                    StaticPathConfig(
                         FRONTEND_URL_PATH,
                         str(frontend_dir),
                         cache_headers=False,
                     )
                 ]
             )
-        except AttributeError:
-            # Fallback for older Home Assistant versions
-            hass.http.register_static_path(
-                FRONTEND_URL_PATH,
-                str(frontend_dir),
-                cache_headers=False,
-            )
+        elif hasattr(hass.http, "register_static_path"):
+            try:
+                hass.http.register_static_path(
+                    FRONTEND_URL_PATH,
+                    str(frontend_dir),
+                    cache_headers=False,
+                )
+            except Exception:
+                pass
 
     # 4. Register left sidebar custom panel
     try:
