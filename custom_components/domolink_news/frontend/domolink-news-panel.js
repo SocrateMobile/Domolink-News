@@ -582,9 +582,9 @@ class DomoLinkNewsPanel extends HTMLElement {
         <!-- ARTICLES GRID -->
         ${displayed.length === 0 ? `
           <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <div class="empty-title">Aucune actualité trouvée</div>
-            <p>Essayez de modifier votre recherche ou de rafraîchir le flux.</p>
+            <div class="empty-icon">${data.last_error ? '⚠️' : (this._isRefreshing ? '🔄' : '📭')}</div>
+            <div class="empty-title">${data.last_error ? 'Information NewsAPI' : (this._isRefreshing ? 'Chargement des actualités...' : 'Aucune actualité disponible')}</div>
+            <p>${data.last_error ? data.last_error : (this._isRefreshing ? 'Interrogation des flux NewsAPI en cours...' : 'Cliquez sur « Actualiser » ci-dessus pour forcer une première synchronisation.')}</p>
           </div>
         ` : `
           <div class="articles-grid">
