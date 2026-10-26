@@ -2,64 +2,70 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configuration de DomoLink-News",
-        "description": "Renseignez votre clé API NewsAPI.org ainsi que vos préférences de pays et catégories.",
+        "title": "Configure DomoLink-News",
+        "description": "Enter your NewsAPI.org API key and choose your country, language and topics.",
         "data": {
-          "api_key": "Clé API NewsAPI",
-          "country": "Pays d'actualités",
-          "language": "Langue des flux",
-          "categories": "Centres d'intérêt actifs",
-          "keywords": "Mots-clés de veille personnalisés (optionnel)"
+          "api_key": "NewsAPI API Key",
+          "country": "News Country",
+          "language": "News Language",
+          "categories": "Active Topics / Categories",
+          "keywords": "Custom Search Keywords (optional)"
         }
       },
       "weights": {
-        "title": "Pondération des centres d'intérêt",
-        "description": "Définissez un poids de préférence (1 à 5 étoiles) pour chaque centre d'intérêt sélectionné.",
+        "title": "Topic Priority Weights",
+        "description": "Set a preference weight (1 to 5 stars) for each selected topic.",
         "data": {
-          "weight_general": "Général & Société (1 à 5)",
-          "weight_journal": "Journal d'information (1 à 5)",
-          "weight_politics": "Actualité politique (1 à 5)",
-          "weight_technology": "Tech & Intelligence Artificielle (1 à 5)",
-          "weight_business": "Économie & Marchés (1 à 5)",
-          "weight_science": "Sciences & Espace (1 à 5)",
-          "weight_health": "Santé & Bien-être (1 à 5)",
-          "weight_sports": "Sports (1 à 5)",
-          "weight_entertainment": "Culture & Divertissement (1 à 5)"
+          "weight_general": "General & Society (1 to 5)",
+          "weight_journal": "News Press & Journal (1 to 5)",
+          "weight_politics": "Political News (1 to 5)",
+          "weight_technology": "Tech & AI (1 to 5)",
+          "weight_business": "Business & Markets (1 to 5)",
+          "weight_science": "Science & Space (1 to 5)",
+          "weight_health": "Health (1 to 5)",
+          "weight_sports": "Sports (1 to 5)",
+          "weight_entertainment": "Entertainment (1 to 5)"
         }
       }
     },
     "error": {
-      "cannot_connect": "Impossible de se connecter au serveur NewsAPI",
-      "invalid_auth": "Clé API NewsAPI invalide",
-      "rate_limited": "Quota NewsAPI atteint ou temporairement suspendu",
-      "unknown": "Erreur inattendue"
+      "cannot_connect": "Could not connect to NewsAPI",
+      "invalid_auth": "Invalid NewsAPI API Key",
+      "rate_limited": "NewsAPI quota reached or temporarily suspended",
+      "unknown": "Unexpected error"
     },
     "abort": {
-      "already_configured": "Cette clé NewsAPI est déjà configurée."
+      "already_configured": "This NewsAPI key is already configured."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Préférences DomoLink-News",
-        "description": "Modifiez vos centres d'intérêt, vos mots-clés et leurs poids de priorité (1 à 5).",
+        "title": "DomoLink-News Preferences",
+        "description": "Update active topics, custom keywords and priority weights (1-5).",
         "data": {
-          "api_key": "Clé API NewsAPI",
-          "country": "Pays d'actualités",
-          "language": "Langue des flux",
-          "categories": "Centres d'intérêt actifs",
-          "keywords": "Mots-clés de veille",
-          "weight_general": "Poids Général (1-5)",
-          "weight_journal": "Poids Journal d'information (1-5)",
-          "weight_politics": "Poids Actualité politique (1-5)",
-          "weight_technology": "Poids Tech & IA (1-5)",
-          "weight_business": "Poids Économie (1-5)",
-          "weight_science": "Poids Sciences (1-5)",
-          "weight_health": "Poids Santé (1-5)",
-          "weight_sports": "Poids Sports (1-5)",
-          "weight_entertainment": "Poids Culture (1-5)"
+          "api_key": "NewsAPI API Key",
+          "country": "News Country",
+          "language": "News Language",
+          "categories": "Active Topics / Categories",
+          "keywords": "Custom Keywords",
+          "weight_general": "General Weight (1-5)",
+          "weight_journal": "Journal Weight (1-5)",
+          "weight_politics": "Politics Weight (1-5)",
+          "weight_technology": "Tech & AI Weight (1-5)",
+          "weight_business": "Business Weight (1-5)",
+          "weight_science": "Science Weight (1-5)",
+          "weight_health": "Health Weight (1-5)",
+          "weight_sports": "Sports Weight (1-5)",
+          "weight_entertainment": "Entertainment Weight (1-5)"
         }
       }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh news feed",
+      "description": "Triggers an immediate news synchronization from NewsAPI and updates sensors and the panel."
     }
   }
 }

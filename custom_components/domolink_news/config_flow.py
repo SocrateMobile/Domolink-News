@@ -1,6 +1,7 @@
 """Config flow for DomoLink-News integration."""
 from __future__ import annotations
 
+import hashlib
 import logging
 from typing import Any
 
@@ -53,7 +54,9 @@ class DomoLinkNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             # Check unique instance or duplicate API key
-            await self.async_set_unique_id(user_input[CONF_API_KEY][-8:])
+            raw_key = user_input[CONF_API_KEY].strip()
+            unique_key = hashlib.sha256(raw_key.encode()).hexdigest()[:16]
+            await self.async_set_unique_id(unique_key)
             self._abort_if_unique_id_configured()
 
             # Test API credentials against NewsAPI

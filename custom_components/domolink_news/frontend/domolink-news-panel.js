@@ -1,6 +1,6 @@
 /**
  * DomoLink-News Custom Panel for Home Assistant
- * Version 1.0.2
+ * Version 1.0.4
  *
  * Features:
  * - Real-time news feed aggregated from NewsAPI.org
@@ -1056,7 +1056,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           <div>
             Flux d'informations propulsé par l'API officielle <strong>NewsAPI.org</strong> et les rédactions partenaires.
           </div>
-          <div>DomoLink-News v1.0.2 • Domotique intelligente Home Assistant</div>
+          <div>DomoLink-News v1.0.4 • Domotique intelligente Home Assistant</div>
         </footer>
       </div>
     `;
@@ -1406,5 +1406,5 @@ class DomoLinkNewsPanel extends HTMLElement {
 
 if (!customElements.get('domolink-news-panel')) {
   customElements.define('domolink-news-panel', DomoLinkNewsPanel);
-  console.info('[DomoLink-News] Custom Panel Web Component v1.0.2 registered');
+  console.info('[DomoLink-News] Custom Panel Web Component v1.0.4 registered');
 }

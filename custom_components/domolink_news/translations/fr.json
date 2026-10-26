@@ -61,5 +61,11 @@
         }
       }
     }
+  },
+  "services": {
+    "refresh": {
+      "name": "Actualiser le flux",
+      "description": "Déclenche une synchronisation immédiate des actualités auprès de NewsAPI et met à jour les capteurs et le panneau."
+    }
   }
 }
