@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure DomoLink-News",
+        "description": "Enter your NewsAPI.org API key and choose your country and topics.",
+        "data": {
+          "api_key": "NewsAPI API Key",
+          "country": "News Country",
+          "language": "News Language",
+          "categories": "Active Topics / Categories",
+          "keywords": "Custom Search Keywords (optional)"
+        }
+      },
+      "weights": {
+        "title": "Topic Priority Weights",
+        "description": "Set a preference weight (1 to 5 stars) for each selected topic.",
+        "data": {
+          "weight_general": "General & Society (1 to 5)",
+          "weight_technology": "Tech & AI (1 to 5)",
+          "weight_business": "Business & Markets (1 to 5)",
+          "weight_science": "Science & Space (1 to 5)",
+          "weight_health": "Health (1 to 5)",
+          "weight_sports": "Sports (1 to 5)",
+          "weight_entertainment": "Entertainment (1 to 5)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to NewsAPI",
+      "invalid_auth": "Invalid NewsAPI API Key",
+      "rate_limited": "NewsAPI quota reached",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This NewsAPI key is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "DomoLink-News Preferences",
+        "description": "Update active topics, custom keywords and priority weights (1-5).",
+        "data": {
+          "country": "News Country",
+          "language": "News Language",
+          "categories": "Active Topics / Categories",
+          "keywords": "Custom Keywords",
+          "weight_general": "General Weight (1-5)",
+          "weight_technology": "Tech & AI Weight (1-5)",
+          "weight_business": "Business Weight (1-5)",
+          "weight_science": "Science Weight (1-5)",
+          "weight_health": "Health Weight (1-5)",
+          "weight_sports": "Sports Weight (1-5)",
+          "weight_entertainment": "Entertainment Weight (1-5)"
+        }
+      }
+    }
+  }
+}

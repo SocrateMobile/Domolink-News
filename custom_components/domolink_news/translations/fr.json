@@ -1,0 +1,60 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuration de DomoLink-News",
+        "description": "Renseignez votre clé API NewsAPI.org ainsi que vos préférences de pays et catégories.",
+        "data": {
+          "api_key": "Clé API NewsAPI",
+          "country": "Pays d'actualités",
+          "language": "Langue des flux",
+          "categories": "Centres d'intérêt actifs",
+          "keywords": "Mots-clés de veille personnalisés (optionnel)"
+        }
+      },
+      "weights": {
+        "title": "Pondération des centres d'intérêt",
+        "description": "Définissez un poids de préférence (1 à 5 étoiles) pour chaque centre d'intérêt sélectionné.",
+        "data": {
+          "weight_general": "Général & Société (1 à 5)",
+          "weight_technology": "Tech & Intelligence Artificielle (1 à 5)",
+          "weight_business": "Économie & Marchés (1 à 5)",
+          "weight_science": "Sciences & Espace (1 à 5)",
+          "weight_health": "Santé & Bien-être (1 à 5)",
+          "weight_sports": "Sports (1 à 5)",
+          "weight_entertainment": "Culture & Divertissement (1 à 5)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de se connecter au serveur NewsAPI",
+      "invalid_auth": "Clé API NewsAPI invalide",
+      "rate_limited": "Quota NewsAPI atteint ou temporairement suspendu",
+      "unknown": "Erreur inattendue"
+    },
+    "abort": {
+      "already_configured": "Cette clé NewsAPI est déjà configurée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Préférences DomoLink-News",
+        "description": "Modifiez vos centres d'intérêt, vos mots-clés et leurs poids de priorité (1 à 5).",
+        "data": {
+          "country": "Pays d'actualités",
+          "language": "Langue des flux",
+          "categories": "Centres d'intérêt actifs",
+          "keywords": "Mots-clés de veille",
+          "weight_general": "Poids Général (1-5)",
+          "weight_technology": "Poids Tech & IA (1-5)",
+          "weight_business": "Poids Économie (1-5)",
+          "weight_science": "Poids Sciences (1-5)",
+          "weight_health": "Poids Santé (1-5)",
+          "weight_sports": "Poids Sports (1-5)",
+          "weight_entertainment": "Poids Culture (1-5)"
+        }
+      }
+    }
+  }
+}
