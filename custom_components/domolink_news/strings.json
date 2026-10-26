@@ -17,6 +17,8 @@
         "description": "Définissez un poids de préférence (1 à 5 étoiles) pour chaque centre d'intérêt sélectionné.",
         "data": {
           "weight_general": "Général & Société (1 à 5)",
+          "weight_journal": "Journal d'information (1 à 5)",
+          "weight_politics": "Actualité politique (1 à 5)",
           "weight_technology": "Tech & Intelligence Artificielle (1 à 5)",
           "weight_business": "Économie & Marchés (1 à 5)",
           "weight_science": "Sciences & Espace (1 à 5)",
@@ -47,6 +49,8 @@
           "categories": "Centres d'intérêt actifs",
           "keywords": "Mots-clés de veille",
           "weight_general": "Poids Général (1-5)",
+          "weight_journal": "Poids Journal d'information (1-5)",
+          "weight_politics": "Poids Actualité politique (1-5)",
           "weight_technology": "Poids Tech & IA (1-5)",
           "weight_business": "Poids Économie (1-5)",
           "weight_science": "Poids Sciences (1-5)",

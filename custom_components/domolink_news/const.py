@@ -3,7 +3,7 @@ from __future__ import annotations
 
 DOMAIN = "domolink_news"
 NAME = "DomoLink-News"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 # Configuration keys
 CONF_API_KEY = "api_key"
@@ -16,7 +16,7 @@ CONF_KEYWORDS = "keywords"
 # Defaults
 DEFAULT_LANGUAGE = "fr"
 DEFAULT_COUNTRY = "fr"
-DEFAULT_CATEGORIES = ["general", "technology", "business", "science"]
+DEFAULT_CATEGORIES = ["general", "journal", "politics", "technology", "business", "science"]
 DEFAULT_WEIGHT = 3
 
 # Adaptive Polling intervals in minutes
@@ -24,8 +24,10 @@ POLL_INTERVAL_DAY = 30    # 07:00 -> 23:00 (32 calls/day)
 POLL_INTERVAL_NIGHT = 120 # 23:00 -> 07:00 (4 calls/night)
 # Total: ~36 calls/day, safely below 100 calls/day NewsAPI free quota.
 
-# NewsAPI Official Categories
+# NewsAPI Official & Custom Categories
 CATEGORY_GENERAL = "general"
+CATEGORY_JOURNAL = "journal"
+CATEGORY_POLITICS = "politics"
 CATEGORY_TECH = "technology"
 CATEGORY_BUSINESS = "business"
 CATEGORY_SCIENCE = "science"
@@ -35,6 +37,8 @@ CATEGORY_ENTERTAINMENT = "entertainment"
 
 ALL_CATEGORIES = [
     CATEGORY_GENERAL,
+    CATEGORY_JOURNAL,
+    CATEGORY_POLITICS,
     CATEGORY_TECH,
     CATEGORY_BUSINESS,
     CATEGORY_SCIENCE,
@@ -47,37 +51,47 @@ CATEGORY_METADATA = {
     CATEGORY_GENERAL: {
         "label": "Général & Société",
         "icon": "mdi:earth",
-        "color": "#38bdf8",
+        "color": "#0284c7",
+    },
+    CATEGORY_JOURNAL: {
+        "label": "Journal d'information",
+        "icon": "mdi:newspaper",
+        "color": "#2563eb",
+    },
+    CATEGORY_POLITICS: {
+        "label": "Actualité politique",
+        "icon": "mdi:bank",
+        "color": "#d97706",
     },
     CATEGORY_TECH: {
         "label": "Tech & Intelligence Artificielle",
         "icon": "mdi:cpu-64-bit",
-        "color": "#818cf8",
+        "color": "#6366f1",
     },
     CATEGORY_BUSINESS: {
         "label": "Économie & Marchés",
         "icon": "mdi:trending-up",
-        "color": "#34d399",
+        "color": "#059669",
     },
     CATEGORY_SCIENCE: {
         "label": "Sciences & Espace",
         "icon": "mdi:flask-outline",
-        "color": "#c084fc",
+        "color": "#9333ea",
     },
     CATEGORY_HEALTH: {
         "label": "Santé & Bien-être",
         "icon": "mdi:heart-pulse",
-        "color": "#f87171",
+        "color": "#dc2626",
     },
     CATEGORY_SPORTS: {
         "label": "Sports",
         "icon": "mdi:trophy-outline",
-        "color": "#fb923c",
+        "color": "#ea580c",
     },
     CATEGORY_ENTERTAINMENT: {
         "label": "Culture & Divertissement",
         "icon": "mdi:filmstrip",
-        "color": "#f472b6",
+        "color": "#db2777",
     },
 }
 
