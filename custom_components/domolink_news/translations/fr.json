@@ -44,6 +44,7 @@
         "title": "Préférences DomoLink-News",
         "description": "Modifiez vos centres d'intérêt, vos mots-clés et leurs poids de priorité (1 à 5).",
         "data": {
+          "api_key": "Clé API NewsAPI",
           "country": "Pays d'actualités",
           "language": "Langue des flux",
           "categories": "Centres d'intérêt actifs",

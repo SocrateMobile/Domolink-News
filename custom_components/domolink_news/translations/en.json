@@ -44,6 +44,7 @@
         "title": "DomoLink-News Preferences",
         "description": "Update active topics, custom keywords and priority weights (1-5).",
         "data": {
+          "api_key": "NewsAPI API Key",
           "country": "News Country",
           "language": "News Language",
           "categories": "Active Topics / Categories",
