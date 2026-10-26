@@ -176,6 +176,8 @@ class DomoLinkNewsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     def update_options(self, options: dict[str, Any]) -> None:
         """Update runtime options without full reload."""
+        if CONF_API_KEY in options and options[CONF_API_KEY]:
+            self.api_key = str(options[CONF_API_KEY]).strip()
         if CONF_CATEGORIES in options:
             self.categories = options[CONF_CATEGORIES]
         if CONF_CATEGORY_WEIGHTS in options:

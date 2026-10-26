@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Hassfest](https://img.shields.io/badge/Hassfest-Passing-10b981.svg)](https://github.com/SocrateMobile/Domolink-News)
-[![Release](https://img.shields.io/badge/Version-v1.0.2-38bdf8.svg)](https://github.com/SocrateMobile/Domolink-News/releases)
+[![Release](https://img.shields.io/badge/Version-v1.0.3-38bdf8.svg)](https://github.com/SocrateMobile/Domolink-News/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **DomoLink-News** est une intégration Home Assistant moderne, rapide et élégante pour diffuser un flux d'actualités synthétique directement dans votre domotique via [NewsAPI.org](https://newsapi.org/).

@@ -181,34 +181,47 @@ class DomoLinkNewsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class DomoLinkNewsOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for DomoLink-News."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-        self._options: dict[str, Any] = dict(config_entry.data)
-        if config_entry.options:
-            self._options.update(config_entry.options)
+    def __init__(self, config_entry: config_entries.ConfigEntry | None = None) -> None:
+        """Initialize options flow defensively."""
+        if config_entry is not None:
+            self._config_entry = config_entry
+
+    @property
+    def config_entry(self) -> config_entries.ConfigEntry:
+        """Return config entry."""
+        if hasattr(self, "_config_entry") and self._config_entry is not None:
+            return self._config_entry
+        return super().config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Manage preferences and category weights."""
+        current_options = dict(self.config_entry.data)
+        if self.config_entry.options:
+            current_options.update(self.config_entry.options)
+
         if user_input is not None:
-            selected_cats = user_input.get(CONF_CATEGORIES, self._options.get(CONF_CATEGORIES, []))
+            selected_cats = user_input.get(CONF_CATEGORIES, current_options.get(CONF_CATEGORIES, []))
             weights = {
                 cat: user_input.get(f"weight_{cat}", DEFAULT_WEIGHT) for cat in selected_cats
             }
             new_data = {
-                **self._options,
+                **current_options,
                 CONF_COUNTRY: user_input[CONF_COUNTRY],
                 CONF_LANGUAGE: user_input[CONF_LANGUAGE],
                 CONF_CATEGORIES: selected_cats,
                 CONF_CATEGORY_WEIGHTS: weights,
                 CONF_KEYWORDS: user_input.get(CONF_KEYWORDS, ""),
             }
+            if user_input.get(CONF_API_KEY):
+                new_data[CONF_API_KEY] = user_input[CONF_API_KEY].strip()
+
+            self.hass.config_entries.async_update_entry(self.config_entry, data=new_data)
             return self.async_create_entry(title="", data=new_data)
 
-        current_cats = self._options.get(CONF_CATEGORIES, DEFAULT_CATEGORIES)
-        current_weights = self._options.get(CONF_CATEGORY_WEIGHTS, {})
+        current_cats = current_options.get(CONF_CATEGORIES, DEFAULT_CATEGORIES)
+        current_weights = current_options.get(CONF_CATEGORY_WEIGHTS, {})
 
         categories_options = [
             selector.SelectOptionDict(
@@ -219,8 +232,13 @@ class DomoLinkNewsOptionsFlowHandler(config_entries.OptionsFlow):
         ]
 
         schema_dict: dict[Any, Any] = {
+            vol.Optional(
+                CONF_API_KEY, default=current_options.get(CONF_API_KEY, "")
+            ): selector.TextSelector(
+                selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+            ),
             vol.Required(
-                CONF_COUNTRY, default=self._options.get(CONF_COUNTRY, DEFAULT_COUNTRY)
+                CONF_COUNTRY, default=current_options.get(CONF_COUNTRY, DEFAULT_COUNTRY)
             ): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=[
@@ -231,7 +249,7 @@ class DomoLinkNewsOptionsFlowHandler(config_entries.OptionsFlow):
                 )
             ),
             vol.Required(
-                CONF_LANGUAGE, default=self._options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
+                CONF_LANGUAGE, default=current_options.get(CONF_LANGUAGE, DEFAULT_LANGUAGE)
             ): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=[
@@ -249,7 +267,7 @@ class DomoLinkNewsOptionsFlowHandler(config_entries.OptionsFlow):
                 )
             ),
             vol.Optional(
-                CONF_KEYWORDS, default=self._options.get(CONF_KEYWORDS, "")
+                CONF_KEYWORDS, default=current_options.get(CONF_KEYWORDS, "")
             ): selector.TextSelector(
                 selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT)
             ),
