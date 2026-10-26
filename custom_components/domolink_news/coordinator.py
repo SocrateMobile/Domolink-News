@@ -419,6 +419,10 @@ class DomoLinkNewsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             len(articles_by_category),
             status_val,
         )
+
+        if not deduped_all and last_error:
+            raise UpdateFailed(f"NewsAPI error: {last_error}")
+
         return self._cached_data
 
     def _clean_articles(

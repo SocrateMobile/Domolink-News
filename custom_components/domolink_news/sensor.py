@@ -51,6 +51,8 @@ class DomoLinkNewsFeedSensor(CoordinatorEntity[DomoLinkNewsCoordinator], SensorE
     @property
     def native_value(self) -> str:
         """Return the headline of the top priority news article."""
+        if not self.coordinator.data:
+            return "Aucune actualité"
         articles = self.coordinator.data.get("all_articles", [])
         if articles:
             return articles[0].get("title", "Aucune actualité")[:250]
@@ -59,7 +61,7 @@ class DomoLinkNewsFeedSensor(CoordinatorEntity[DomoLinkNewsCoordinator], SensorE
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return full news list, sync status and weight metadata."""
-        data = self.coordinator.data
+        data = self.coordinator.data or {}
         all_articles = data.get("all_articles", [])
         return {
             "integration": NAME,
@@ -97,6 +99,8 @@ class DomoLinkNewsCategorySensor(
     @property
     def native_value(self) -> str:
         """Return the latest headline for this category."""
+        if not self.coordinator.data:
+            return "Aucune actualité"
         by_cat = self.coordinator.data.get("articles_by_category", {})
         articles = by_cat.get(self._category, [])
         if articles:
@@ -106,6 +110,8 @@ class DomoLinkNewsCategorySensor(
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return articles and weight for this specific category."""
+        if not self.coordinator.data:
+            return {"category": self._category, "weight": 3, "count": 0, "articles": []}
         by_cat = self.coordinator.data.get("articles_by_category", {})
         articles = by_cat.get(self._category, [])
         weight = self.coordinator.category_weights.get(self._category, 3)

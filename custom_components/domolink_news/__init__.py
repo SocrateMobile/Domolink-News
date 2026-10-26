@@ -98,22 +98,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except Exception as err:  # pylint: disable=broad-except
         _LOGGER.error("Failed to register DomoLink-News panel: %s", err)
 
-    # 5. Register WebSocket API commands for the custom panel
-    websocket_api.async_register_command(hass, ws_get_news_data)
-    websocket_api.async_register_command(hass, ws_refresh_news_data)
-    websocket_api.async_register_command(hass, ws_save_config)
+    # 5. Register WebSocket API commands for the custom panel (only once)
+    if not hass.data[DOMAIN].get("_ws_registered"):
+        websocket_api.async_register_command(hass, ws_get_news_data)
+        websocket_api.async_register_command(hass, ws_refresh_news_data)
+        websocket_api.async_register_command(hass, ws_save_config)
+        hass.data[DOMAIN]["_ws_registered"] = True
 
     # 6. Register HA service
     async def async_handle_refresh_service(call: ServiceCall) -> None:
         """Handle manual refresh service call."""
         _LOGGER.info("DomoLink-News service refresh called")
         for item in hass.data[DOMAIN].values():
-            if "coordinator" in item:
+            if isinstance(item, dict) and "coordinator" in item:
                 await item["coordinator"].async_request_refresh()
 
-    hass.services.async_register(
-        DOMAIN, "refresh", async_handle_refresh_service, schema=vol.Schema({})
-    )
+    if not hass.services.has_service(DOMAIN, "refresh"):
+        hass.services.async_register(
+            DOMAIN, "refresh", async_handle_refresh_service, schema=vol.Schema({})
+        )
 
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     return True
@@ -125,9 +128,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)
 
-        # If no more entries remain, remove the sidebar panel
-        if not hass.data[DOMAIN]:
+        # If no more active entries remain, remove sidebar panel and services
+        remaining_entries = [k for k in hass.data[DOMAIN] if k != "_ws_registered"]
+        if not remaining_entries:
             frontend.async_remove_panel(hass, PANEL_URL_PATH)
+            if hass.services.has_service(DOMAIN, "refresh"):
+                hass.services.async_remove(DOMAIN, "refresh")
             hass.data.pop(DOMAIN, None)
 
     return unload_ok
