@@ -12,6 +12,10 @@
   ],
   "documentation": "https://github.com/SocrateMobile/Domolink-News",
   "integration_type": "hub",
+  "categories": [
+    "hub",
+    "sensor"
+  ],
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/SocrateMobile/Domolink-News/issues",
   "requirements": [],
