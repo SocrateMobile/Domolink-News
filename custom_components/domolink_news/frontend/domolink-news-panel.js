@@ -1,9 +1,10 @@
 /**
  * DomoLink-News Custom Panel for Home Assistant
- * Version 1.0.4
+ * Version 1.0.5
  *
  * Features:
  * - Real-time news feed aggregated from NewsAPI.org
+ * - Adaptive dark / light theme support via Home Assistant CSS variables
  * - High-contrast, vivid category badges
  * - Curated categories including "Actualité politique" and "Journal d'information"
  * - Live Settings Tab (⚙️ Paramètres) to edit API key, country, language, filters and 1-5 star weights
@@ -245,7 +246,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           justify-content: space-between;
           gap: 16px;
           padding-bottom: 24px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
           margin-bottom: 24px;
         }
 
@@ -273,15 +274,13 @@ class DomoLinkNewsPanel extends HTMLElement {
           font-size: 26px;
           font-weight: 800;
           letter-spacing: -0.02em;
-          background: linear-gradient(135deg, #ffffff 40%, #93c5fd);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: var(--primary-text-color, #0f172a);
         }
 
         .subtitle {
           margin: 4px 0 0 0;
           font-size: 13px;
-          color: var(--secondary-text-color, #94a3b8);
+          color: var(--secondary-text-color, #64748b);
           display: flex;
           align-items: center;
           flex-wrap: wrap;
@@ -304,8 +303,8 @@ class DomoLinkNewsPanel extends HTMLElement {
           padding: 2px 8px;
           border-radius: 12px;
           background: rgba(14, 165, 233, 0.15);
-          border: 1px solid rgba(56, 189, 248, 0.3);
-          color: #38bdf8;
+          border: 1px solid rgba(56, 189, 248, 0.4);
+          color: #0284c7;
           font-weight: 700;
           font-size: 11px;
         }
@@ -326,17 +325,17 @@ class DomoLinkNewsPanel extends HTMLElement {
           width: 100%;
           padding: 10px 14px 10px 36px;
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.04);
-          color: #fff;
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+          background: var(--card-background-color, rgba(127, 127, 127, 0.08));
+          color: var(--primary-text-color, #0f172a);
           font-size: 13px;
           outline: none;
           transition: border-color 0.2s, background 0.2s;
         }
 
         .search-input:focus {
-          border-color: #38bdf8;
-          background: rgba(255, 255, 255, 0.08);
+          border-color: #0284c7;
+          background: var(--card-background-color, rgba(127, 127, 127, 0.12));
         }
 
         .search-icon {
@@ -345,7 +344,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           top: 50%;
           transform: translateY(-50%);
           font-size: 14px;
-          color: #64748b;
+          color: var(--secondary-text-color, #64748b);
           pointer-events: none;
         }
 
@@ -355,9 +354,9 @@ class DomoLinkNewsPanel extends HTMLElement {
           gap: 8px;
           padding: 10px 16px;
           border-radius: 10px;
-          border: 1px solid rgba(56, 189, 248, 0.3);
-          background: rgba(56, 189, 248, 0.1);
-          color: #38bdf8;
+          border: 1px solid rgba(56, 189, 248, 0.4);
+          background: rgba(56, 189, 248, 0.12);
+          color: #0284c7;
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
@@ -365,8 +364,8 @@ class DomoLinkNewsPanel extends HTMLElement {
         }
 
         .refresh-btn:hover {
-          background: rgba(56, 189, 248, 0.2);
-          border-color: #38bdf8;
+          background: rgba(56, 189, 248, 0.22);
+          border-color: #0284c7;
         }
 
         .refresh-btn:disabled {
@@ -409,9 +408,9 @@ class DomoLinkNewsPanel extends HTMLElement {
           gap: 8px;
           padding: 9px 16px;
           border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.03);
-          color: var(--secondary-text-color, #94a3b8);
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
+          background: var(--card-background-color, rgba(127, 127, 127, 0.05));
+          color: var(--secondary-text-color, #64748b);
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
@@ -420,46 +419,48 @@ class DomoLinkNewsPanel extends HTMLElement {
         }
 
         .tab-btn:hover {
-          background: rgba(255, 255, 255, 0.08);
-          color: #fff;
+          background: var(--card-background-color, rgba(127, 127, 127, 0.12));
+          color: var(--primary-text-color, #0f172a);
         }
 
         .tab-btn.active {
-          background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(99, 102, 241, 0.25));
-          border-color: #38bdf8;
-          color: #fff;
-          box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2);
+          background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.15));
+          border-color: #0284c7;
+          color: #0284c7;
+          box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+          font-weight: 700;
         }
 
         .tab-btn-settings {
           background: rgba(245, 158, 11, 0.1);
-          border-color: rgba(245, 158, 11, 0.25);
-          color: #fbbf24;
+          border-color: rgba(245, 158, 11, 0.3);
+          color: #d97706;
         }
 
         .tab-btn-settings:hover {
           background: rgba(245, 158, 11, 0.2);
-          border-color: #f59e0b;
-          color: #fff;
+          border-color: #d97706;
+          color: #b45309;
         }
 
         .tab-btn-settings.active {
-          background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
-          border-color: #f59e0b;
-          color: #fff;
-          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.25));
+          border-color: #d97706;
+          color: #d97706;
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
 
         .tab-stars {
           font-size: 11px;
-          color: #facc15;
+          color: #eab308;
           letter-spacing: -1px;
         }
 
         .tab-badge {
           padding: 2px 7px;
           border-radius: 20px;
-          background: rgba(255, 255, 255, 0.12);
+          background: var(--divider-color, rgba(127, 127, 127, 0.18));
+          color: var(--primary-text-color, inherit);
           font-size: 11px;
           font-weight: 700;
         }
@@ -474,18 +475,19 @@ class DomoLinkNewsPanel extends HTMLElement {
         .card {
           display: flex;
           flex-direction: column;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--card-background-color, #ffffff);
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
           border-radius: 16px;
           overflow: hidden;
           transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
           position: relative;
+          box-shadow: var(--ha-card-box-shadow, 0 2px 8px rgba(0, 0, 0, 0.06));
         }
 
         .card:hover {
           transform: translateY(-4px);
-          border-color: rgba(56, 189, 248, 0.35);
-          box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+          border-color: #0284c7;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
         }
 
         .card-img-wrap {
@@ -514,7 +516,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           align-items: center;
           justify-content: center;
           font-size: 48px;
-          background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+          background: linear-gradient(135deg, #1e293b, #0f172a);
         }
 
         /* ULTRA VISIBLE CATEGORY BADGE */
@@ -532,7 +534,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.3);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.35);
           z-index: 2;
         }
 
@@ -548,7 +550,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           font-size: 12px;
-          color: var(--secondary-text-color, #94a3b8);
+          color: var(--secondary-text-color, #64748b);
           margin-bottom: 10px;
         }
 
@@ -563,19 +565,20 @@ class DomoLinkNewsPanel extends HTMLElement {
           font-weight: 800;
           padding: 1px 6px;
           border-radius: 4px;
-          background: rgba(14, 165, 233, 0.2);
-          color: #38bdf8;
+          background: rgba(14, 165, 233, 0.15);
+          color: #0284c7;
           border: 1px solid rgba(56, 189, 248, 0.3);
           letter-spacing: 0.02em;
         }
 
         .card-source {
           font-weight: 700;
-          color: #cbd5e1;
+          color: var(--primary-text-color, #1e293b);
         }
 
         .card-time {
           font-size: 11px;
+          color: var(--secondary-text-color, #64748b);
         }
 
         .card-title {
@@ -583,7 +586,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           font-weight: 700;
           line-height: 1.4;
           margin: 0 0 10px 0;
-          color: #fff;
+          color: var(--primary-text-color, #0f172a);
           display: -webkit-box;
           -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
@@ -593,7 +596,7 @@ class DomoLinkNewsPanel extends HTMLElement {
         .card-desc {
           font-size: 13px;
           line-height: 1.5;
-          color: var(--secondary-text-color, #94a3b8);
+          color: var(--secondary-text-color, #475569);
           margin: 0 0 16px 0;
           display: -webkit-box;
           -webkit-line-clamp: 3;
@@ -608,12 +611,12 @@ class DomoLinkNewsPanel extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding-top: 12px;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.12));
         }
 
         .card-stars {
           font-size: 12px;
-          color: #facc15;
+          color: #eab308;
           letter-spacing: -1px;
         }
 
@@ -624,7 +627,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           padding: 6px 14px;
           border-radius: 8px;
           background: rgba(56, 189, 248, 0.15);
-          color: #38bdf8;
+          color: #0284c7;
           font-size: 12px;
           font-weight: 600;
           text-decoration: none;
@@ -632,15 +635,15 @@ class DomoLinkNewsPanel extends HTMLElement {
         }
 
         .card-btn:hover {
-          background: #38bdf8;
-          color: #020617;
+          background: #0284c7;
+          color: #ffffff;
         }
 
         /* EMPTY STATE */
         .empty-state {
           text-align: center;
           padding: 80px 20px;
-          color: var(--secondary-text-color, #94a3b8);
+          color: var(--secondary-text-color, #64748b);
         }
 
         .empty-icon {
@@ -652,19 +655,19 @@ class DomoLinkNewsPanel extends HTMLElement {
         .empty-title {
           font-size: 18px;
           font-weight: 700;
-          color: #fff;
+          color: var(--primary-text-color, #0f172a);
           margin-bottom: 8px;
         }
 
         /* SETTINGS VIEW */
         .settings-container {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: var(--card-background-color, #ffffff);
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.2));
           border-radius: 20px;
           padding: 32px;
           max-width: 900px;
           margin: 0 auto;
-          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
         .settings-header {
@@ -672,7 +675,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           align-items: center;
           gap: 16px;
           padding-bottom: 20px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 1px solid var(--divider-color, rgba(127, 127, 127, 0.15));
           margin-bottom: 28px;
         }
 
@@ -692,13 +695,13 @@ class DomoLinkNewsPanel extends HTMLElement {
           margin: 0;
           font-size: 20px;
           font-weight: 700;
-          color: #fff;
+          color: var(--primary-text-color, #0f172a);
         }
 
         .settings-subtitle {
           margin: 4px 0 0 0;
           font-size: 13px;
-          color: #94a3b8;
+          color: var(--secondary-text-color, #64748b);
         }
 
         .form-section {
@@ -710,7 +713,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: #38bdf8;
+          color: #0284c7;
           margin-bottom: 14px;
           display: flex;
           align-items: center;
@@ -725,18 +728,18 @@ class DomoLinkNewsPanel extends HTMLElement {
           display: block;
           font-size: 13px;
           font-weight: 600;
-          color: #e2e8f0;
+          color: var(--primary-text-color, #0f172a);
           margin-bottom: 6px;
         }
 
         .input-help {
           font-size: 12px;
-          color: #94a3b8;
+          color: var(--secondary-text-color, #64748b);
           margin-top: 4px;
         }
 
         .input-help a {
-          color: #38bdf8;
+          color: #0284c7;
           text-decoration: underline;
         }
 
@@ -744,17 +747,16 @@ class DomoLinkNewsPanel extends HTMLElement {
           width: 100%;
           padding: 10px 14px;
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.04);
-          color: #fff;
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+          background: var(--card-background-color, rgba(127, 127, 127, 0.06));
+          color: var(--primary-text-color, #0f172a);
           font-size: 14px;
           outline: none;
           transition: border-color 0.2s;
         }
 
         .text-input:focus {
-          border-color: #38bdf8;
-          background: rgba(255, 255, 255, 0.07);
+          border-color: #0284c7;
         }
 
         .api-input-wrap {
@@ -765,9 +767,9 @@ class DomoLinkNewsPanel extends HTMLElement {
         .toggle-btn {
           padding: 10px 14px;
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.06);
-          color: #fff;
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+          background: var(--card-background-color, rgba(127, 127, 127, 0.08));
+          color: var(--primary-text-color, #0f172a);
           cursor: pointer;
           font-size: 14px;
         }
@@ -782,9 +784,9 @@ class DomoLinkNewsPanel extends HTMLElement {
           width: 100%;
           padding: 10px 14px;
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: #1e293b;
-          color: #fff;
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
+          background: var(--card-background-color, rgba(127, 127, 127, 0.08));
+          color: var(--primary-text-color, #0f172a);
           font-size: 14px;
           outline: none;
         }
@@ -802,14 +804,14 @@ class DomoLinkNewsPanel extends HTMLElement {
           justify-content: space-between;
           padding: 12px 16px;
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--card-background-color, rgba(127, 127, 127, 0.04));
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.15));
           transition: background 0.2s, border-color 0.2s;
         }
 
         .category-config-item:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.15);
+          background: var(--card-background-color, rgba(127, 127, 127, 0.08));
+          border-color: #0284c7;
         }
 
         .cat-info {
@@ -827,13 +829,13 @@ class DomoLinkNewsPanel extends HTMLElement {
         .cat-label {
           font-size: 14px;
           font-weight: 600;
-          color: #fff;
+          color: var(--primary-text-color, #0f172a);
           cursor: pointer;
         }
 
         .cat-desc {
           font-size: 12px;
-          color: #94a3b8;
+          color: var(--secondary-text-color, #64748b);
         }
 
         .cat-weight-controls {
@@ -844,7 +846,7 @@ class DomoLinkNewsPanel extends HTMLElement {
 
         .weight-label {
           font-size: 12px;
-          color: #94a3b8;
+          color: var(--secondary-text-color, #64748b);
         }
 
         .weight-slider {
@@ -854,7 +856,7 @@ class DomoLinkNewsPanel extends HTMLElement {
 
         .weight-stars-display {
           font-size: 14px;
-          color: #facc15;
+          color: #eab308;
           letter-spacing: -1px;
           min-width: 75px;
           text-align: right;
@@ -867,15 +869,15 @@ class DomoLinkNewsPanel extends HTMLElement {
           justify-content: flex-end;
           gap: 14px;
           padding-top: 24px;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.15));
         }
 
         .btn-cancel {
           padding: 11px 20px;
           border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.15);
+          border: 1px solid var(--divider-color, rgba(127, 127, 127, 0.25));
           background: transparent;
-          color: #94a3b8;
+          color: var(--secondary-text-color, #64748b);
           font-size: 13px;
           font-weight: 600;
           cursor: pointer;
@@ -883,8 +885,8 @@ class DomoLinkNewsPanel extends HTMLElement {
         }
 
         .btn-cancel:hover {
-          color: #fff;
-          background: rgba(255, 255, 255, 0.05);
+          color: var(--primary-text-color, #0f172a);
+          background: var(--card-background-color, rgba(127, 127, 127, 0.1));
         }
 
         .btn-save {
@@ -922,17 +924,17 @@ class DomoLinkNewsPanel extends HTMLElement {
           font-weight: 600;
           background: rgba(16, 185, 129, 0.15);
           border: 1px solid #10b981;
-          color: #34d399;
+          color: #059669;
         }
 
         /* ATTRIBUTION FOOTER */
         .footer-attribution {
           margin-top: 48px;
           padding-top: 24px;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.15));
           text-align: center;
           font-size: 12px;
-          color: #64748b;
+          color: var(--secondary-text-color, #64748b);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -940,11 +942,11 @@ class DomoLinkNewsPanel extends HTMLElement {
         }
 
         .footer-attribution strong {
-          color: #38bdf8;
+          color: #0284c7;
         }
 
         .footer-attribution a {
-          color: #38bdf8;
+          color: #0284c7;
           text-decoration: none;
         }
 
@@ -1056,7 +1058,7 @@ class DomoLinkNewsPanel extends HTMLElement {
           <div>
             Flux d'informations propulsé par l'API officielle <strong>NewsAPI.org</strong> et les rédactions partenaires.
           </div>
-          <div>DomoLink-News v1.0.4 • Domotique intelligente Home Assistant</div>
+          <div>DomoLink-News v1.0.5 • Domotique intelligente Home Assistant</div>
         </footer>
       </div>
     `;
@@ -1406,5 +1408,5 @@ class DomoLinkNewsPanel extends HTMLElement {
 
 if (!customElements.get('domolink-news-panel')) {
   customElements.define('domolink-news-panel', DomoLinkNewsPanel);
-  console.info('[DomoLink-News] Custom Panel Web Component v1.0.4 registered');
+  console.info('[DomoLink-News] Custom Panel Web Component v1.0.5 registered');
 }
