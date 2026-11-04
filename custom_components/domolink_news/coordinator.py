@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import hashlib
 import logging
 from typing import Any
+from urllib.parse import urlparse
 
 import aiohttp
 
@@ -404,7 +405,6 @@ class DomoLinkNewsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "status": status_val,
             "last_error": last_error,
             "config": {
-                "api_key": self.api_key,
                 "country": self.country,
                 "language": self.language,
                 "categories": self.categories,
@@ -451,10 +451,10 @@ class DomoLinkNewsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     )
                     continue
 
-            url = a.get("url") or ""
+            url = self._sanitize_http_url(a.get("url") or "")
             source_name = (a.get("source") or {}).get("name") or "Presse"
             published_at = a.get("publishedAt") or ""
-            image_url = a.get("urlToImage") or ""
+            image_url = self._sanitize_http_url(a.get("urlToImage") or "")
 
             article_id = hashlib.md5(f"{url}_{title}".encode()).hexdigest()[:12]
 
@@ -474,3 +474,17 @@ class DomoLinkNewsCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 }
             )
         return cleaned
+
+    @staticmethod
+    def _sanitize_http_url(raw_url: str) -> str:
+        """Accept only valid http:// or https:// URLs."""
+        if not raw_url or not isinstance(raw_url, str):
+            return ""
+        candidate = raw_url.strip()
+        try:
+            parsed = urlparse(candidate)
+            if parsed.scheme in ("http", "https") and parsed.netloc:
+                return candidate
+        except ValueError:
+            pass
+        return ""

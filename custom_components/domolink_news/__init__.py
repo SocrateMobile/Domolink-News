@@ -150,8 +150,36 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
 
 
 # ---------------------------------------------------------------------------
-# WebSocket API Handlers
+# WebSocket API Helpers & Handlers
 # ---------------------------------------------------------------------------
+
+
+def _get_active_coordinator(
+    hass: HomeAssistant,
+) -> tuple[str | None, DomoLinkNewsCoordinator | None]:
+    """Return the first active (entry_id, coordinator) tuple."""
+    domain_data = hass.data.get(DOMAIN)
+    if not domain_data:
+        return None, None
+    for key, value in domain_data.items():
+        if key != "_ws_registered" and isinstance(value, dict) and "coordinator" in value:
+            return key, value["coordinator"]
+    return None, None
+
+
+def _build_ws_payload(
+    coordinator: DomoLinkNewsCoordinator,
+    connection: websocket_api.ActiveConnection,
+) -> dict[str, Any]:
+    """Return coordinator data without exposing raw api_key; include api_key_set only for admins."""
+    raw_data = dict(coordinator.data or {})
+    cfg = dict(raw_data.get("config") or {})
+    cfg.pop(CONF_API_KEY, None)
+    if connection.user and connection.user.is_admin:
+        cfg["api_key_set"] = bool(coordinator.api_key)
+    raw_data["config"] = cfg
+    return raw_data
+
 
 @websocket_api.websocket_command(
     {
@@ -165,14 +193,12 @@ def ws_get_news_data(
     msg: dict[str, Any],
 ) -> None:
     """Return latest news data across active categories and weights."""
-    if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+    _, coordinator = _get_active_coordinator(hass)
+    if coordinator is None:
         connection.send_error(msg["id"], "not_found", "DomoLink-News is not initialized")
         return
 
-    # Use first available coordinator
-    first_key = next(iter(hass.data[DOMAIN]))
-    coordinator: DomoLinkNewsCoordinator = hass.data[DOMAIN][first_key]["coordinator"]
-    connection.send_result(msg["id"], coordinator.data)
+    connection.send_result(msg["id"], _build_ws_payload(coordinator, connection))
 
 
 @websocket_api.websocket_command(
@@ -187,14 +213,13 @@ async def ws_refresh_news_data(
     msg: dict[str, Any],
 ) -> None:
     """Trigger immediate NewsAPI refresh and return updated data."""
-    if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+    _, coordinator = _get_active_coordinator(hass)
+    if coordinator is None:
         connection.send_error(msg["id"], "not_found", "DomoLink-News is not initialized")
         return
 
-    first_key = next(iter(hass.data[DOMAIN]))
-    coordinator: DomoLinkNewsCoordinator = hass.data[DOMAIN][first_key]["coordinator"]
     await coordinator.async_request_refresh()
-    connection.send_result(msg["id"], coordinator.data)
+    connection.send_result(msg["id"], _build_ws_payload(coordinator, connection))
 
 
 @websocket_api.websocket_command(
@@ -208,19 +233,19 @@ async def ws_refresh_news_data(
         vol.Optional("keywords"): cv.string,
     }
 )
+@websocket_api.require_admin
 @websocket_api.async_response
 async def ws_save_config(
     hass: HomeAssistant,
     connection: websocket_api.ActiveConnection,
     msg: dict[str, Any],
 ) -> None:
-    """Save updated DomoLink-News configuration live from the panel."""
-    if DOMAIN not in hass.data or not hass.data[DOMAIN]:
+    """Save updated DomoLink-News configuration live from the panel (admin only)."""
+    first_entry_id, coordinator = _get_active_coordinator(hass)
+    if first_entry_id is None or coordinator is None:
         connection.send_error(msg["id"], "not_found", "DomoLink-News is not initialized")
         return
 
-    first_entry_id = next(iter(hass.data[DOMAIN]))
-    coordinator: DomoLinkNewsCoordinator = hass.data[DOMAIN][first_entry_id]["coordinator"]
     entry = hass.config_entries.async_get_entry(first_entry_id)
     if not entry:
         connection.send_error(msg["id"], "not_found", "Config entry not found")
@@ -228,7 +253,9 @@ async def ws_save_config(
 
     new_data = dict(entry.data)
     if "api_key" in msg and msg["api_key"] is not None:
-        new_data[CONF_API_KEY] = str(msg["api_key"]).strip()
+        cleaned_key = str(msg["api_key"]).strip()
+        if cleaned_key:
+            new_data[CONF_API_KEY] = cleaned_key
     if "country" in msg and msg["country"] is not None:
         new_data[CONF_COUNTRY] = str(msg["country"]).strip().lower()
     if "language" in msg and msg["language"] is not None:
@@ -248,4 +275,7 @@ async def ws_save_config(
     coordinator.update_options(new_data)
     await coordinator.async_request_refresh()
 
-    connection.send_result(msg["id"], {"success": True, "data": coordinator.data})
+    connection.send_result(
+        msg["id"],
+        {"success": True, "data": _build_ws_payload(coordinator, connection)},
+    )

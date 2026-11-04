@@ -1,6 +1,6 @@
 /**
  * DomoLink-News Custom Panel for Home Assistant
- * Version 1.0.5
+ * Version 1.0.6
  *
  * Features:
  * - Real-time news feed aggregated from NewsAPI.org
@@ -21,8 +21,32 @@ class DomoLinkNewsPanel extends HTMLElement {
     this._isRefreshing = false;
     this._isSaving = false;
     this._showApiKey = false;
+    this._apiKeySet = false;
     this._saveSuccessMessage = '';
     this._configForm = null;
+  }
+
+  _escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  _sanitizeHttpUrl(rawUrl) {
+    if (!rawUrl || typeof rawUrl !== 'string') return '';
+    try {
+      const parsed = new URL(rawUrl.trim());
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return parsed.href;
+      }
+    } catch {
+      // Reject malformed or non-HTTP(S) URLs
+    }
+    return '';
   }
 
   set hass(hass) {
@@ -57,8 +81,9 @@ class DomoLinkNewsPanel extends HTMLElement {
     const defaultCats = this._data.categories || ['general', 'journal', 'politics', 'technology', 'business', 'science'];
     const defaultWeights = this._data.category_weights || {};
 
+    this._apiKeySet = Boolean(cfg.api_key_set);
     this._configForm = {
-      api_key: cfg.api_key || '',
+      api_key: '',
       country: cfg.country || 'fr',
       language: cfg.language || 'fr',
       categories: [...defaultCats],
@@ -92,13 +117,16 @@ class DomoLinkNewsPanel extends HTMLElement {
     try {
       const payload = {
         type: 'domolink_news/save_config',
-        api_key: this._configForm.api_key.trim(),
         country: this._configForm.country,
         language: this._configForm.language,
         categories: this._configForm.categories,
         category_weights: this._configForm.category_weights,
         keywords: this._configForm.keywords.trim(),
       };
+      const trimmedKey = (this._configForm.api_key || '').trim();
+      if (trimmedKey) {
+        payload.api_key = trimmedKey;
+      }
       const res = await this._hass.callWS(payload);
       if (res && res.data) {
         this._data = res.data;
@@ -991,7 +1019,7 @@ class DomoLinkNewsPanel extends HTMLElement {
                 <span>•</span>
                 <span class="api-pill">Source : NewsAPI.org</span>
                 <span>•</span>
-                <span>${lastSyncStr}</span>
+                <span>${this._escapeHtml(lastSyncStr)}</span>
               </p>
             </div>
           </div>
@@ -1004,7 +1032,7 @@ class DomoLinkNewsPanel extends HTMLElement {
                   type="text" 
                   class="search-input" 
                   placeholder="Rechercher une actualité..." 
-                  value="${this._searchQuery}"
+                  value="${this._escapeHtml(this._searchQuery)}"
                   id="searchInput"
                 />
               </div>
@@ -1026,10 +1054,11 @@ class DomoLinkNewsPanel extends HTMLElement {
             ${categories.map(cat => {
               const meta = this._getCategoryMeta(cat);
               const count = (articlesByCat[cat] || []).length;
-              const w = weights[cat] || 3;
+              const w = Number(weights[cat]) || 3;
+              const safeCat = this._escapeHtml(cat);
               return `
-                <button class="tab-btn ${this._activeTab === cat ? 'active' : ''}" data-tab="${cat}">
-                  <span>${meta.icon} ${meta.label}</span>
+                <button class="tab-btn ${this._activeTab === cat ? 'active' : ''}" data-tab="${safeCat}">
+                  <span>${this._escapeHtml(meta.icon)} ${this._escapeHtml(meta.label)}</span>
                   <span class="tab-stars" title="Priorité ${w}/5">${this._renderStars(w)}</span>
                   <span class="tab-badge">${count}</span>
                 </button>
@@ -1044,21 +1073,23 @@ class DomoLinkNewsPanel extends HTMLElement {
             ` : ''}
           </nav>
 
-          <!-- SETTINGS TAB BUTTON -->
-          <button class="tab-btn tab-btn-settings ${this._activeTab === 'settings' ? 'active' : ''}" data-tab="settings">
-            <span>⚙️ Paramètres & Filtres</span>
-          </button>
+          <!-- SETTINGS TAB BUTTON (Admin only) -->
+          ${(!this._hass || !this._hass.user || this._hass.user.is_admin) ? `
+            <button class="tab-btn tab-btn-settings ${this._activeTab === 'settings' ? 'active' : ''}" data-tab="settings">
+              <span>⚙️ Paramètres & Filtres</span>
+            </button>
+          ` : ''}
         </div>
 
         <!-- MAIN VIEW (ARTICLES OR SETTINGS) -->
-        ${this._activeTab === 'settings' ? this._renderSettingsView() : this._renderArticlesView(displayed, data)}
+        ${this._activeTab === 'settings' && (!this._hass || !this._hass.user || this._hass.user.is_admin) ? this._renderSettingsView() : this._renderArticlesView(displayed, data)}
 
         <!-- ATTRIBUTION FOOTER -->
         <footer class="footer-attribution">
           <div>
             Flux d'informations propulsé par l'API officielle <strong>NewsAPI.org</strong> et les rédactions partenaires.
           </div>
-          <div>DomoLink-News v1.0.5 • Domotique intelligente Home Assistant</div>
+          <div>DomoLink-News v1.0.6 • Domotique intelligente Home Assistant</div>
         </footer>
       </div>
     `;
@@ -1077,11 +1108,14 @@ class DomoLinkNewsPanel extends HTMLElement {
     };
 
     const allAvailable = this._getAllAvailableCategories();
+    const apiPlaceholder = this._apiKeySet
+      ? '•••••••••••••••• (Clé configurée — laisser vide pour conserver)'
+      : 'Ex: 8f492b6a9e144a1bb674...';
 
     return `
       <div class="settings-container">
         ${this._saveSuccessMessage ? `
-          <div class="toast-msg">${this._saveSuccessMessage}</div>
+          <div class="toast-msg">${this._escapeHtml(this._saveSuccessMessage)}</div>
         ` : ''}
 
         <div class="settings-header">
@@ -1102,8 +1136,8 @@ class DomoLinkNewsPanel extends HTMLElement {
                 type="${this._showApiKey ? 'text' : 'password'}" 
                 class="text-input" 
                 id="cfgApiKey" 
-                value="${form.api_key}" 
-                placeholder="Ex: 8f492b6a9e144a1bb674..." 
+                value="${this._escapeHtml(form.api_key)}" 
+                placeholder="${this._escapeHtml(apiPlaceholder)}" 
               />
               <button type="button" class="toggle-btn" id="toggleApiKeyBtn" title="Afficher/Masquer">
                 ${this._showApiKey ? '🙈' : '👁️'}
@@ -1158,22 +1192,23 @@ class DomoLinkNewsPanel extends HTMLElement {
           <div class="categories-config-list">
             ${allAvailable.map(cat => {
               const isChecked = form.categories.includes(cat.id);
-              const weight = form.category_weights[cat.id] || 3;
+              const weight = Number(form.category_weights[cat.id]) || 3;
+              const safeCatId = this._escapeHtml(cat.id);
               return `
                 <div class="category-config-item">
                   <div class="cat-info">
                     <input 
                       type="checkbox" 
                       class="cat-checkbox" 
-                      id="cat_${cat.id}" 
-                      data-cat="${cat.id}" 
+                      id="cat_${safeCatId}" 
+                      data-cat="${safeCatId}" 
                       ${isChecked ? 'checked' : ''} 
                     />
                     <div>
-                      <label class="cat-label" for="cat_${cat.id}">
-                        <span>${cat.icon}</span> <span>${cat.label}</span>
+                      <label class="cat-label" for="cat_${safeCatId}">
+                        <span>${this._escapeHtml(cat.icon)}</span> <span>${this._escapeHtml(cat.label)}</span>
                       </label>
-                      <div class="cat-desc">${cat.desc}</div>
+                      <div class="cat-desc">${this._escapeHtml(cat.desc)}</div>
                     </div>
                   </div>
 
@@ -1186,9 +1221,9 @@ class DomoLinkNewsPanel extends HTMLElement {
                       step="1" 
                       value="${weight}" 
                       class="weight-slider" 
-                      data-cat="${cat.id}" 
+                      data-cat="${safeCatId}" 
                     />
-                    <span class="weight-stars-display" id="stars_${cat.id}">${this._renderStars(weight)}</span>
+                    <span class="weight-stars-display" id="stars_${safeCatId}">${this._renderStars(weight)}</span>
                   </div>
                 </div>
               `;
@@ -1205,7 +1240,7 @@ class DomoLinkNewsPanel extends HTMLElement {
               type="text" 
               class="text-input" 
               id="cfgKeywords" 
-              value="${form.keywords}" 
+              value="${this._escapeHtml(form.keywords)}" 
               placeholder="Ex: domotique OR Home Assistant OR photovoltaïque" 
             />
             <div class="input-help">
@@ -1232,7 +1267,7 @@ class DomoLinkNewsPanel extends HTMLElement {
         <div class="empty-state">
           <div class="empty-icon">${data.last_error ? '⚠️' : (this._isRefreshing ? '🔄' : '📭')}</div>
           <div class="empty-title">${data.last_error ? 'Information NewsAPI' : (this._isRefreshing ? 'Chargement des actualités...' : 'Aucune actualité disponible')}</div>
-          <p>${data.last_error ? data.last_error : (this._isRefreshing ? 'Interrogation des flux NewsAPI.org en cours...' : 'Cliquez sur « Actualiser » ci-dessus ou configurez vos centres d\'intérêt dans l\'onglet « Paramètres ».')}</p>
+          <p>${data.last_error ? this._escapeHtml(data.last_error) : (this._isRefreshing ? 'Interrogation des flux NewsAPI.org en cours...' : 'Cliquez sur « Actualiser » ci-dessus ou configurez vos centres d\'intérêt dans l\'onglet « Paramètres ».')}</p>
         </div>
       `;
     }
@@ -1242,18 +1277,28 @@ class DomoLinkNewsPanel extends HTMLElement {
         ${displayed.map(a => {
           const meta = this._getCategoryMeta(a.category);
           const timeAgo = this._formatTimeAgo(a.publishedAt);
+          const safeImg = this._sanitizeHttpUrl(a.image);
+          const safeUrl = this._sanitizeHttpUrl(a.url);
+          const safeTitle = this._escapeHtml(a.title);
+          const safeSource = this._escapeHtml(a.source || 'Presse');
+          const safeDesc = this._escapeHtml(a.description || 'Consultez l\'article complet pour plus de détails.');
+          const safeTimeAgo = this._escapeHtml(timeAgo);
+          const safeIcon = this._escapeHtml(meta.icon);
+          const safeLabel = this._escapeHtml(meta.label);
+          const safeColor = this._escapeHtml(meta.color);
+          const safeWeight = Number(a.weight) || 3;
           return `
             <article class="card">
               <div class="card-img-wrap">
-                ${a.image ? `
-                  <img class="card-img" src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'card-img-fallback\\'>${meta.icon}</div>';" />
+                ${safeImg ? `
+                  <img class="card-img" src="${this._escapeHtml(safeImg)}" alt="${safeTitle}" data-fallback-icon="${safeIcon}" loading="lazy" />
                 ` : `
-                  <div class="card-img-fallback">${meta.icon}</div>
+                  <div class="card-img-fallback">${safeIcon}</div>
                 `}
                 <!-- HIGH CONTRAST SOLID BADGE -->
-                <div class="card-category-badge" style="background:${meta.color};">
-                  <span>${meta.icon}</span>
-                  <span>${meta.label}</span>
+                <div class="card-category-badge" style="background:${safeColor};">
+                  <span>${safeIcon}</span>
+                  <span>${safeLabel}</span>
                 </div>
               </div>
 
@@ -1261,20 +1306,26 @@ class DomoLinkNewsPanel extends HTMLElement {
                 <div class="card-meta">
                   <div class="card-source-wrap">
                     <span class="source-api-badge">NewsAPI</span>
-                    <span class="card-source">• ${a.source || 'Presse'}</span>
+                    <span class="card-source">• ${safeSource}</span>
                   </div>
-                  <span class="card-time">${timeAgo}</span>
+                  <span class="card-time">${safeTimeAgo}</span>
                 </div>
 
-                <h2 class="card-title">${a.title}</h2>
-                <p class="card-desc">${a.description || 'Consultez l\'article complet pour plus de détails.'}</p>
+                <h2 class="card-title">${safeTitle}</h2>
+                <p class="card-desc">${safeDesc}</p>
 
                 <div class="card-footer">
-                  <span class="card-stars" title="Priorité accordée : ${a.weight || 3}/5">${this._renderStars(a.weight || 3)}</span>
-                  <a class="card-btn" href="${a.url}" target="_blank" rel="noopener noreferrer">
-                    <span>Lire l'article</span>
-                    <span>→</span>
-                  </a>
+                  <span class="card-stars" title="Priorité accordée : ${safeWeight}/5">${this._renderStars(safeWeight)}</span>
+                  ${safeUrl ? `
+                    <a class="card-btn" href="${this._escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer">
+                      <span>Lire l'article</span>
+                      <span>→</span>
+                    </a>
+                  ` : `
+                    <span class="card-btn" style="opacity:0.5; pointer-events:none;">
+                      <span>Lien indisponible</span>
+                    </span>
+                  `}
                 </div>
               </div>
             </article>
@@ -1285,6 +1336,17 @@ class DomoLinkNewsPanel extends HTMLElement {
   }
 
   _attachEventListeners() {
+    // 0. Image error fallback without inline event handler
+    this.shadowRoot.querySelectorAll('img.card-img').forEach(img => {
+      img.addEventListener('error', () => {
+        const icon = img.getAttribute('data-fallback-icon') || '📰';
+        const fallback = document.createElement('div');
+        fallback.className = 'card-img-fallback';
+        fallback.textContent = icon;
+        img.replaceWith(fallback);
+      }, { once: true });
+    });
+
     // 1. Tab buttons
     this.shadowRoot.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -1408,5 +1470,5 @@ class DomoLinkNewsPanel extends HTMLElement {
 
 if (!customElements.get('domolink-news-panel')) {
   customElements.define('domolink-news-panel', DomoLinkNewsPanel);
-  console.info('[DomoLink-News] Custom Panel Web Component v1.0.5 registered');
+  console.info('[DomoLink-News] Custom Panel Web Component v1.0.6 registered');
 }
