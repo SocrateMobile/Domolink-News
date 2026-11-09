@@ -1,5 +1,10 @@
 # DomoLink-News pour Home Assistant 📰
 
+[![Documentation Officielle](https://img.shields.io/badge/Documentation-socratemobile.fr-06b6d4.svg?logo=googlechrome&logoColor=white)](https://socratemobile.fr/integration.html?id=domolink-news)
+
+> 🌐 **Site officiel & Documentation complète** : Retrouvez le guide d'installation pas à pas, les entités supportées et les exemples d'automatisations sur [socratemobile.fr](https://socratemobile.fr/integration.html?id=domolink-news).
+
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![Hassfest](https://img.shields.io/badge/Hassfest-Passing-10b981.svg)](https://github.com/SocrateMobile/Domolink-News)
 [![Release](https://img.shields.io/badge/Version-v1.0.6-38bdf8.svg)](https://github.com/SocrateMobile/Domolink-News/releases)
