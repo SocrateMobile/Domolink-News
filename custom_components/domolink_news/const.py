@@ -20,9 +20,9 @@ DEFAULT_CATEGORIES = ["general", "journal", "politics", "technology", "business"
 DEFAULT_WEIGHT = 3
 
 # Adaptive Polling intervals in minutes
-POLL_INTERVAL_DAY = 30    # 07:00 -> 23:00 (32 calls/day)
-POLL_INTERVAL_NIGHT = 120 # 23:00 -> 07:00 (4 calls/night)
-# Total: ~36 calls/day, safely below 100 calls/day NewsAPI free quota.
+POLL_INTERVAL_DAY = 120   # 07:00 -> 23:00 (8 cycles/day)
+POLL_INTERVAL_NIGHT = 360 # 23:00 -> 07:00 (1-2 cycles/night)
+# Total: ~9-10 cycles/day (~54-90 requests/day), safely below 100 requests/day NewsAPI free quota.
 
 # NewsAPI Official & Custom Categories
 CATEGORY_GENERAL = "general"

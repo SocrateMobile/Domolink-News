@@ -267,8 +267,8 @@ async def ws_save_config(
     if "keywords" in msg and msg["keywords"] is not None:
         new_data[CONF_KEYWORDS] = str(msg["keywords"]).strip()
 
-    # Update HA config entry data
-    hass.config_entries.async_update_entry(entry, data=new_data)
+    # Update HA config entry data & options in sync
+    hass.config_entries.async_update_entry(entry, data=new_data, options=new_data)
 
     # Update coordinator in place and trigger fresh fetch
     coordinator.api_key = new_data.get(CONF_API_KEY, coordinator.api_key)
