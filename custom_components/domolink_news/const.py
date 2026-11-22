@@ -3,7 +3,7 @@ from __future__ import annotations
 
 DOMAIN = "domolink_news"
 NAME = "DomoLink-News"
-VERSION = "1.0.6"
+VERSION = "1.0.7"
 
 # Configuration keys
 CONF_API_KEY = "api_key"
